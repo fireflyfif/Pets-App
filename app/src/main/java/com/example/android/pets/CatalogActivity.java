@@ -28,6 +28,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListViewCompat;
 import android.util.Log;
@@ -44,15 +45,13 @@ import com.example.android.pets.data.PetProvider;
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CatalogActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<Cursor> {
 
-    static final String[] PROJECTION = {
-            PetEntry._ID,
-            PetEntry.COLUMN_PET_NAME,
-            PetEntry.COLUMN_PET_BREED};
-
+    /** Identifier for the pet data loader */
     private static final int PET_LOADER = 0;
 
+    /** Adapter for the ListView */
     PetCursorAdapter mCursorAdapter;
 
     @Override
@@ -83,7 +82,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         petsList.setAdapter(mCursorAdapter);
 
         // Prepare the loader.
-        getLoaderManager().initLoader(PET_LOADER, null, null);
+        getSupportLoaderManager().initLoader(PET_LOADER, null, this);
     }
 
     @Override
@@ -136,11 +135,17 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // Define a projection that specifies the columns from the table we care about.
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED };
+
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
                 PetEntry.CONTENT_URI,   // Provider content URI to query
-                PROJECTION,             // Columns to include in the resulting Cursor
+                projection,             // Columns to include in the resulting Cursor
                 null,                   // No selection clauses
                 null,                   // No selection arguments
                 null);                  // Default sort order
