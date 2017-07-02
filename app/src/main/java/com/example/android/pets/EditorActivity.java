@@ -158,12 +158,15 @@ public class EditorActivity extends AppCompatActivity implements
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         String weightString = mWeightEditText.getText().toString().trim();
-        int weight;
 
-        try {
-            weight = Integer.parseInt(weightString);
-        } catch (NumberFormatException e) {
-            weight = 0;
+        // Check if this is supposed to be a new pet
+        // and check if all the fields in the editor are blank
+        if (mCurrentPetUri == null &&
+                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(breedString) &&
+                TextUtils.isEmpty(weightString) && mGender == PetEntry.GENDER_UNKNOWN) {
+            // Since no fields were modified, we can return early without creating a new pet.
+            // No need to create ContentValues and no need to do any ContentProvider operations.
+            return;
         }
 
         // Create a ContentValues object where column names are the keys,
@@ -172,10 +175,17 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(PetEntry.COLUMN_PET_NAME, nameString);
         values.put(PetEntry.COLUMN_PET_BREED, breedString);
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        // If the weight is not provided by the user, don't try parse the string into an
+        // integer value. Use 0 by default.
+        int weight = 0;
+        if (!TextUtils.isEmpty(weightString)) {
+            weight = Integer.parseInt(weightString);
+        }
         values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
         if (mCurrentPetUri == null) {
-            // Insert a new row for pet in the provider, returning the content URI for the new pet.
+            // This is a NEW pet, so insert a new pet into the provider,
+            // returning the content URI for the new pet.
             Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
             // Show a toast message depending on whether or not the insertion was successful
@@ -190,6 +200,10 @@ public class EditorActivity extends AppCompatActivity implements
             }
         } else {
             Log.v("EditorActivity", "Print the current uri " + mCurrentPetUri);
+            // Otherwise this is an EXISTING pet, so update the pet with content URI: mCurrentPetUri
+            // and pass in the new ContentValues. Pass in null for the selection and selection args
+            // because mCurrentPetUri will already identify the correct row in the database that
+            // we want to modify.
             int mRowsUpdated = getContentResolver().update(
                     mCurrentPetUri,
                     values,
@@ -252,7 +266,7 @@ public class EditorActivity extends AppCompatActivity implements
                 PetEntry.COLUMN_PET_NAME,
                 PetEntry.COLUMN_PET_BREED,
                 PetEntry.COLUMN_PET_GENDER,
-                PetEntry.COLUMN_PET_WEIGHT };
+                PetEntry.COLUMN_PET_WEIGHT};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,       // Parent activity context
