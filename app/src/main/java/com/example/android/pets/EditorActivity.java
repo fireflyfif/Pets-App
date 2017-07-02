@@ -144,7 +144,7 @@ public class EditorActivity extends AppCompatActivity implements
             // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mGender = 0; // Unknown
+                mGender = PetEntry.GENDER_UNKNOWN;
             }
         });
     }
@@ -232,7 +232,7 @@ public class EditorActivity extends AppCompatActivity implements
                 PetEntry.COLUMN_PET_NAME,
                 PetEntry.COLUMN_PET_BREED,
                 PetEntry.COLUMN_PET_GENDER,
-                PetEntry.COLUMN_PET_WEIGHT};
+                PetEntry.COLUMN_PET_WEIGHT };
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,       // Parent activity context
@@ -275,8 +275,6 @@ public class EditorActivity extends AppCompatActivity implements
                 case PetEntry.GENDER_FEMALE:
                     mGenderSpinner.setSelection(2);
                     break;
-                case PetEntry.GENDER_UNKNOWN:
-                    mGenderSpinner.setSelection(0);
                 default:
                     mGenderSpinner.setSelection(0);
                     break;
