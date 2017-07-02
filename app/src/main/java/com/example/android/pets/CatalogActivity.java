@@ -95,6 +95,7 @@ public class CatalogActivity extends AppCompatActivity implements
                 // Fore example, the URI would be "content://com.example.android.pets/pets/2"
                 // if the pet with ID 2 was clicked.
                 Uri currentPetUri = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
+                Log.v("CatalogActivity", "Current Pet URI is " + currentPetUri);
 
                 // Set the URI on the data field of the intent
                 intent.setData(currentPetUri);
@@ -111,7 +112,6 @@ public class CatalogActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     /**
